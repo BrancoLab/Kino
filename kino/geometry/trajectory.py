@@ -44,7 +44,7 @@ class Trajectory:
             self.compute_kinematics(smoothing_window)
 
     def __len__(self):
-        return len(self.x)
+        return len(self.x) if isinstance(self.x, np.ndarray) else 1
 
     def __rich_repr__(self):
         yield "Name: ", self.name
@@ -59,8 +59,10 @@ class Trajectory:
             otherise for string item the corrisponding attribute is returned
         """
         if isinstance(item, int):
-            return Vector(self.x[item], self.y[item])
-
+            if isinstance(self.x, np.ndarray):
+                return self.xy[item]
+            else:
+                return self.xy
         elif isinstance(item, str):
             return self.__dict__[item]
 
@@ -142,7 +144,10 @@ class Trajectory:
         """
             Array with frame index
         """
-        return np.arange(len(self.x))
+        if isinstance(self.x, (int, float)):
+            return np.array([0])
+        else:
+            return np.arange(len(self.x))
 
     @property
     def time(self) -> np.ndarray:

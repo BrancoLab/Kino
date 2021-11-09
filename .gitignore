@@ -1,3 +1,23 @@
+*/secrets.py
+.vscode/settings.json
+proj/secrets.py
+workspace.py
+logs_*
+
+.vscode/*
+.vscode/
+.vscode
+.vscode\settings.json
+.vscode
+vscode/*
+vscode/
+vscode
+.vscode
+.vscode/*
+.vscode/settings.json
+vscode/settings.json
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

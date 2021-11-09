@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import numpy as np
+import matplotlib.pyplot as plt
 from typing import Union, Tuple, List
+
+from kino.draw.gliphs import Arrow, Arrows
 
 
 class Vector:  # 2D vector
@@ -30,6 +33,23 @@ class Vector:  # 2D vector
             return f"Vector @ ({self.x}, {self.y})"
         else:
             return f"Array of {len(self.x)} vectors."
+
+    def __draw__(self, ax: plt.Axes, **kwargs):
+        """
+            Draws the vector staring from origin
+        """
+        if self.single_vec:
+            Arrow(0, 0, self.angle, self.magnitude, ax=ax, **kwargs)
+        else:
+            Arrows(
+                np.zeros(len(self)),
+                np.zeros(len(self)),
+                self.angle,
+                self.magnitude,
+                ax=ax,
+                step=5,
+                **kwargs,
+            )
 
     def __len__(self):
         if not self.single_vec:
@@ -134,12 +154,3 @@ class Vector:  # 2D vector
                     for i in range(len(self))
                 ]
             )
-
-
-if __name__ == "__main__":
-
-    v1 = Vector(np.zeros(5), np.ones(5))
-
-    v2 = v1[np.arange(3)]
-
-    print(v1, v2)

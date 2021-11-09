@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import sys
+
+sys.path.append("./")
 
 import numpy as np
 from typing import Union
@@ -10,9 +13,15 @@ from myterial import blue_grey_dark
 from kino.geometry import Vector
 from kino.geometry import vectors_utils as vu
 from kino.math import smooth, derivative, angular_derivative
+from kino.draw import colors, gliphs
 
 
 class Trajectory:
+    """
+        Class representing a 2D trajectory specified by a set of XY coordinates.
+        Computes kinematics variables on the trajectory (e.g. velocity vector)
+    """
+
     def __init__(
         self,
         x: np.ndarray,
@@ -55,22 +64,51 @@ class Trajectory:
         elif isinstance(item, str):
             return self.__dict__[item]
 
-    def __draw__(self, ax: plt.Axes = None, **kwargs):
-        raise NotImplementedError
-        # DrawPath(
-        #     self.x.coordinates,
-        #     self.y.coordinates,
-        #     color=self.color,
-        #     ax=ax,
-        #     **kwargs,
-        # )
+    def __draw__(
+        self,
+        ax: plt.Axes,
+        show_vectors: bool = False,
+        vectors_scale: float = 0.25,
+        **kwargs,
+    ):
+        # draw main tracking line
+        ax.plot(
+            self.x, self.y, color=self.color, **kwargs,
+        )
 
-        # ax.set(
-        #     xticks=[self.x.min, self.x.max],
-        #     yticks=[self.y.min, self.y.max],
-        #     xlabel=self.x.unit,
-        #     ylabel=self.y.unit,
-        # )
+        # draw kinematics
+        if show_vectors:
+            gliphs.Arrows(
+                self.x,
+                self.y,
+                self.velocity.angle,
+                L=vectors_scale,
+                color=colors.velocity,
+                step=self.fps,
+            )
+            gliphs.Arrows(
+                self.x,
+                self.y,
+                self.acceleration.angle,
+                L=vectors_scale,
+                color=colors.acceleration,
+                step=self.fps,
+            )
+            gliphs.Arrows(
+                self.x,
+                self.y,
+                self.normal.angle,
+                L=vectors_scale,
+                color=colors.normal,
+                step=self.fps,
+            )
+
+        ax.set(
+            xticks=[round(self.x.min(), 2), round(self.x.max(), 2)],
+            yticks=[round(self.y.min(), 2), round(self.y.max(), 2)],
+            xlabel="cm",
+            ylabel="cm",
+        )
 
     def __matmul__(self, other: np.ndarray) -> Trajectory:
         """
@@ -159,3 +197,16 @@ class Trajectory:
         # compute distance travelled
         self.distance = np.sum(self.speed) / self.fps
         self.comulative_distance = np.cumsum(self.speed) / self.fps
+
+
+if __name__ == "__main__":
+    x = np.linspace(0, np.pi * 2, 300)
+    y = np.cos(x)
+
+    path = Trajectory(x, y, fps=50)
+
+    from kino.draw import draw
+
+    draw(path, lw=3)
+
+    plt.show()

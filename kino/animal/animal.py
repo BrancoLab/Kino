@@ -21,6 +21,13 @@ class Animal:
         and their connections.
     """
 
+    paws = [
+        "left_fl",
+        "right_fl",
+        "right_hl",
+        "left_hl",
+    ]
+
     def __init__(
         self,
         animal_data: Union[str, Trajectory, dict],

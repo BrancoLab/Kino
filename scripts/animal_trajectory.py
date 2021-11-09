@@ -17,7 +17,8 @@ from myterial import (
 )
 
 from kino.animal import Animal
-from kino.draw import draw
+
+# from kino import plots
 
 animal_data = dict(
     name="Mouse",
@@ -61,10 +62,7 @@ print(animal)
 
 # ----------------------------------- plot ----------------------------------- #
 
-draw(animal)
-
-short = animal.at(30)
-draw(short)
+# plots.draw_locomotion_sequence(animal)
 
 
 plt.show()

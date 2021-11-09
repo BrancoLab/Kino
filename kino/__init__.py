@@ -14,6 +14,4 @@ install()
 
 
 from kino import animal
-
-# from kino import draw
 from kino import geometry

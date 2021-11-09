@@ -1,2 +1,2 @@
 from kino.geometry.vector import Vector
-from kino.geometry.trajectory import Trajectory
+from kino.geometry.trajectory import Trajectory, AnchoredTrajectory

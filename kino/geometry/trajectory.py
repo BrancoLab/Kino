@@ -6,6 +6,7 @@ sys.path.append("./")
 
 import numpy as np
 from typing import Union
+from dataclasses import dataclass
 
 from myterial import blue_grey_dark
 
@@ -44,11 +45,8 @@ class Trajectory:
     def __len__(self):
         return len(self.x) if isinstance(self.x, np.ndarray) else 1
 
-    def __rich_repr__(self):
-        yield "Name: ", self.name
-        yield "\n   n frames: ", len(self)
-        yield f"\n   duration (seconds)", round(self.time[-1], 2)
-        yield "\n   path length (cm) ", round(self.distance, 2)
+    def __repr__(self):
+        return f'Trajectory: "{self.name}"'
 
     def __getitem__(self, item: Union[str, int]) -> Union[Vector, np.ndarray]:
         """
@@ -119,12 +117,6 @@ class Trajectory:
             Computes kinematic quantities like
             speed, velocity, acceleration...
         """
-        # smooth XY trajectory
-        if window:
-            self.x = smooth(self.x, window)
-            self.y = smooth(self.y, window)
-            self.xy = Vector(self.x, self.y)
-
         # compute kinematics vectors / scalar quantities
         (
             self.velocity,
@@ -154,3 +146,18 @@ class Trajectory:
         # compute distance travelled
         self.distance = np.sum(self.speed) / self.fps
         self.comulative_distance = np.cumsum(self.speed) / self.fps
+
+
+@dataclass
+class AnchoredTrajectory:
+    """
+        Represents a sequence of 2D vectors at a sequence of points (XY).
+    """
+
+    x: np.ndarray
+    y: np.ndarray
+    vector: Vector
+    name: str
+
+    def __repr__(self) -> str:
+        return f"AnchoredTrajectory: {self.name}"

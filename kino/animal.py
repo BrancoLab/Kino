@@ -4,6 +4,16 @@ import rich.repr
 from typing import Optional
 from dataclasses import dataclass
 
+from myterial import (
+    pink,
+    pink_darker,
+    blue,
+    blue_darker,
+    blue_grey_light,
+    blue_grey_dark,
+    blue_grey_darker,
+)
+
 
 @dataclass
 class BodyPart:
@@ -31,8 +41,12 @@ class Bone:
     bp2: BodyPart
     color: str
 
+    @property
+    def name(self) -> str:
+        return f"{self.bp1.name}_{self.bp2.name}"
+
     def __repr__(self) -> str:
-        return f"Bone: {self.bp1.name} -> {self.bp2.name}"
+        return f"Bone: '{self.bp1.name} -> {self.bp2.name}''"
 
     def __rich_repr__(self) -> rich.repr.Resul:
         yield f"{self.bp1.name} -> {self.bp2.name}"
@@ -53,7 +67,14 @@ class Animal:
         """
         self.build(animal_data)
 
-    def __rich_repr__(self):
+    def __repr__(self) -> str:
+        return f"""
+{self.name}
+body parts ({self.n_bodyparts}) = {self.bodyparts}
+bones ({self.n_bones}) = {self.bones}
+            """
+
+    def __rich_repr__(self) -> rich.repr.Resul:
         yield f"{self.name}"
         yield f"    body parts ({self.n_bodyparts}) ", self.bodyparts
         yield f"    bones ({self.n_bones})", self.bones, True
@@ -102,3 +123,47 @@ class Animal:
         # store metadata
         self.n_bones = len(self.bones)
         self.n_bodyparts = len(self.bodyparts_names)
+
+
+"""
+    Default animal with fixed skeleton
+"""
+
+default_animal_data = dict(
+    name="Mouse",
+    paws=("left_fl", "right_fl", "right_hl", "left_hl"),
+    bodyparts=(
+        "left_fl",
+        "right_fl",
+        "body",
+        "right_hl",
+        "left_hl",
+        "snout",
+        "neck",
+        "tail_base",
+    ),
+    colors=dict(
+        left_fl=pink,
+        right_fl=blue,
+        right_hl=blue_darker,
+        left_hl=pink_darker,
+        snout=blue_grey_light,
+        neck=blue_grey_light,
+        body=blue_grey_dark,
+        tail_base=blue_grey_darker,
+    ),
+    skeleton=(
+        ("body", "left_fl", blue_darker),
+        ("body", "right_fl", blue_darker),
+        ("body", "right_hl", blue_darker),
+        ("body", "left_hl", blue_darker),
+        ("snout", "neck", "k"),
+        ("neck", "body", "k"),
+        ("body", "tail_base", "k"),
+    ),
+)
+
+mouse = Animal(default_animal_data)
+
+if __name__ == "__main__":
+    print(mouse)

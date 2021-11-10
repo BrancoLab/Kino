@@ -3,25 +3,27 @@ import sys
 sys.path.append("./")
 
 import pandas as pd
-import matplotlib.pyplot as plt
 
 
 from kino.animal import mouse
 from kino.locomotion import Locomotion
-from kino.animate.base import PoseAnimation
+from kino.animate import CompleteAnimation
 
+"""
+    Creates a slowmo animation of the locomotion bout
+    in the allocentric and egocentric views
+"""
 
 tracking = pd.read_hdf("scripts/example_tracking.h5")
 
 
 locomotion = Locomotion(mouse, tracking, fps=60)
+egocentric = locomotion.to_egocentric()
 
-f, ax = plt.subplots(figsize=(6, 8))
-
-animator = PoseAnimation(
+anim = CompleteAnimation(
     locomotion,
-    fps=30,
-    ax=ax,
+    egocentric,
+    fps=60,
     bodyparts=["right_fl", "right_hl", "left_fl", "left_hl", "com"],
 )
-animator.animate("cache/base_locomotion.mp4")
+anim.animate("cache/complete_locomotion.mp4")

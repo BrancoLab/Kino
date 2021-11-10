@@ -109,6 +109,10 @@ class Trajectory:
         """
         return self.frames / self.fps
 
+    @property
+    def duration(self) -> float:
+        return self.time[-1]
+
     def trim(self, start: int, end: int) -> Trajectory:
         """
             Cuts kinematics variables between two time frames

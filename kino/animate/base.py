@@ -1,19 +1,20 @@
 import matplotlib.pyplot as plt
 from celluloid import Camera
 from typing import Union, List
-from rich.progress import track
 from loguru import logger
 from pathlib import Path
 import numpy as np
 
+from kino.progress import track
 from kino.locomotion import Locomotion
 from kino.draw import DrawAnimal
 
 
-class BaseAnimation:
+class PoseAnimation:
     """
-        Base class to animate a Locomotion trajectory
-        (either egocentric or base reference frames)
+        Base class to animate a Locomotion trajectory showing
+        the animal's pose at each frame.
+        (either egocentric or allocentric reference frames)
     """
 
     def __init__(
@@ -28,7 +29,7 @@ class BaseAnimation:
         self.bps_to_draw = bodyparts or list(self.locomotion.bodyparts.keys())
         self.ax = ax or plt.gca()
 
-        # initialize camera
+        # initialize animation parameters
         self.frame_idx = 0
         self.interpolation_idx = 0
 
@@ -43,6 +44,10 @@ class BaseAnimation:
             if self.n_interpolated > 1
             else [1]
         )
+
+    @property
+    def n_frames_tot(self) -> int:
+        return int(len(self.locomotion) * len(self.P))
 
     def make_next_frame(self) -> bool:
         if (
@@ -71,10 +76,13 @@ class BaseAnimation:
         camera = Camera(self.ax.figure)
 
         # run
-        L = int(len(self.locomotion) * len(self.P))
-        logger.debug(f"Creating animation with {L} frames | fps: {self.fps}")
+        logger.debug(
+            f"Creating animation with {self.n_frames_tot} frames | fps: {self.fps}"
+        )
         for framen in track(
-            range(L), transient=True, description="Creating animation"
+            range(self.n_frames_tot),
+            transient=True,
+            description="Creating animation",
         ):
             running = self.make_next_frame()
             camera.snap()

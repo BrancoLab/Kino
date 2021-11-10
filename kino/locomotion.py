@@ -1,15 +1,17 @@
 from __future__ import annotations
 
+from copy import deepcopy
 import pandas as pd
 from typing import Union
 import rich.repr
 import numpy as np
 from copy import copy
+from loguru import logger
 
 from myterial import blue_grey_dark
 
 from kino.animal import Animal, Bone
-from kino.geometry import Trajectory, AnchoredTrajectory
+from kino.geometry import Trajectory, AnchoredTrajectory, coordinates
 
 
 class Locomotion:
@@ -19,11 +21,16 @@ class Locomotion:
     """
 
     def __init__(
-        self, animal: Animal, tracking: Union[dict, pd.DataFrame], fps: int = 1
+        self,
+        animal: Animal,
+        tracking: Union[dict, pd.DataFrame],
+        fps: int = 1,
+        view: str = "allocentric",
     ):
         self.animal = animal
         self.tracking = tracking
         self.fps = fps
+        self.view = view
 
         # Create a Trajectory object for each of the animal's bodyparts
         self.bodyparts = {}
@@ -41,8 +48,7 @@ class Locomotion:
         # create an AnchoredTrajectory object for each bone (2D vectors at a point)
         self.bones = {}
         for bone in animal.bones:
-            bone_trajectory = self._make_bone(bone)
-            self.bones[bone.name] = bone_trajectory
+            self.bones[bone.name] = self._make_bone(bone)
 
         # create bones for head and body axis
         self.head = self._make_bone(animal.head)
@@ -50,6 +56,11 @@ class Locomotion:
 
         # compute paws center of mass
         self.compute_center_of_mass(*self.animal.paws)
+
+        dur = self.bodyparts["body"].duration
+        logger.debug(
+            f'Created {self.view} locomotion for animal "{self.animal.name}": {dur:.2f}s ({self.fps} fps)'
+        )
 
     def __getitem__(self, item: Union[int, str]):
         """
@@ -127,3 +138,52 @@ class Locomotion:
         )
         self.bodyparts["com"] = self.com
         return self.com
+
+    def to_egocentric(self) -> Locomotion:
+        """
+            returns a Locomotion object in which the position of the paws is 
+            in the egocentric reference frame, centered at the animal's
+            center of mass and oriented like the animal's body axis
+        """
+        egocentric = deepcopy(self)
+        egocentric.view = "egocentric"
+
+        # create rotation matrices to rotate all tracking such that body axis faces North
+        Rs = [coordinates.R(-theta) for theta in self.body_axis.vector.angle2]
+
+        # transform the coordinates of each bodypart
+        com = self.bodyparts["com"]
+        for bpname, bp in egocentric.bodyparts.items():
+            allo_bp = self.bodyparts[bpname]
+
+            # translate all bodyparts so that the CoM is at the origin at frames
+            xy = np.array(
+                [allo_bp.x - com.x, allo_bp.y - com.y]
+            ).T  # n_frames-by-2
+
+            # apply rotation matrices
+            xy_rotated = np.vstack([R @ xy[i, :] for i, R in enumerate(Rs)])
+
+            # create new bodypart
+            egocentric.bodyparts[bpname] = Trajectory(
+                xy_rotated[:, 0],
+                xy_rotated[:, 1],
+                name=bpname,
+                fps=bp.fps,
+                color=bp.color,
+            )
+        # re-create bones
+        egocentric.bones = {}
+        for bone in egocentric.animal.bones:
+            egocentric.bones[bone.name] = egocentric._make_bone(bone)
+
+        # create bones for head and body axis
+        egocentric.head = egocentric._make_bone(egocentric.animal.head)
+        egocentric.body_axis = egocentric._make_bone(
+            egocentric.animal.body_axis
+        )
+
+        logger.debug(
+            f'Created {egocentric.view} locomotion for animal "{egocentric.animal.name}"'
+        )
+        return egocentric

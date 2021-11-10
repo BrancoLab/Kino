@@ -3,6 +3,7 @@ from __future__ import annotations
 import rich.repr
 from typing import Optional
 from dataclasses import dataclass
+from loguru import logger
 
 from myterial import (
     pink,
@@ -64,6 +65,7 @@ class Animal:
 
         """
         self.build(animal_data)
+        logger.debug(f'Created animal: "{self.name}"')
 
     def __repr__(self) -> str:
         return f"""

@@ -60,6 +60,7 @@ class DrawBone:
             bone.vector.angle,
             head_width=0,
             L=bone.vector.magnitude,
+            width=4,
             color=bone.color,
             ax=ax,
             **kwargs,
@@ -75,10 +76,6 @@ class DrawAnimal:
             - head axis
     """
 
-    def __init__(self, animal: Animal):
-        # TODO draw stuff
-        return
-
     @classmethod
     def draw(cls, animal: Animal, locomotion: Locomotion, ax: plt.Axes):
         """
@@ -87,10 +84,10 @@ class DrawAnimal:
         # scatter the paws
         for paw_name in animal.paws:
             paw = locomotion[paw_name]
-            DrawBodyPart.scatter(paw, ax, s=25)
+            DrawBodyPart.scatter(paw, ax, s=50)
 
         # mark CoM
-        DrawBodyPart.scatter(locomotion["com"], ax, s=25)
+        DrawBodyPart.scatter(locomotion["com"], ax, s=75)
 
         # draw body axis and head
         DrawBone(locomotion.body_axis, ax)

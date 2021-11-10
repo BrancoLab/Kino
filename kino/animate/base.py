@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 
 from kino.locomotion import Locomotion
-from kino.geometry import interpolation
+from kino.draw import DrawAnimal
 
 
 class BaseAnimation:
@@ -58,31 +58,10 @@ class BaseAnimation:
         # get interpolation factor
         p = self.P[self.interpolation_idx]
 
-        # draw the position of the center of mass
-        self.ax.plot(
-            self.locomotion.com.x,
-            self.locomotion.com.y,
-            lw=2,
-            color=self.locomotion.com.color,
-            zorder=0,
+        # draw the interpolated position of the animal
+        DrawAnimal.at_frame_interpolated(
+            self.locomotion.animal, self.locomotion, self.frame_idx, p, self.ax
         )
-
-        # iterate over bodyparts and draw position
-        for bp in self.locomotion.bodyparts.values():
-            if bp.name not in self.bps_to_draw:
-                continue
-            bp_pos = interpolation.interpolate_vector_at_frame(
-                bp.xy, self.frame_idx, p
-            )
-            self.ax.scatter(
-                bp_pos.x,
-                bp_pos.y,
-                s=100,
-                color=bp.color,
-                lw=1,
-                ec=[0.2, 0.2, 0.2],
-                zorder=100,
-            )
 
         self.interpolation_idx += 1
         return True

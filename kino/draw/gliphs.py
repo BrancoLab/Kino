@@ -20,6 +20,7 @@ class Arrow:
         theta: float,  # in degrees
         L: float = 1,  # length
         width: float = 4,
+        head_width: float = 1,
         color: str = blue_grey_dark,
         zorder: int = 100,
         ax: plt.Axes = None,
@@ -42,23 +43,24 @@ class Arrow:
         # compute arrow position
         theta = np.radians(theta)
         angle = np.deg2rad(30)
-        d = 0.5 * L
 
         x_start = x
         y_start = y
         x_end = x + L * np.cos(theta)
         y_end = y + L * np.sin(theta)
+        if head_width is None:
+            head_width = 0.5 * L
 
         theta_hat_L = theta + np.pi - angle
         theta_hat_R = theta + np.pi + angle
 
         x_hat_start = x_end
-        x_hat_end_L = x_hat_start + d * np.cos(theta_hat_L)
-        x_hat_end_R = x_hat_start + d * np.cos(theta_hat_R)
+        x_hat_end_L = x_hat_start + head_width * np.cos(theta_hat_L)
+        x_hat_end_R = x_hat_start + head_width * np.cos(theta_hat_R)
 
         y_hat_start = y_end
-        y_hat_end_L = y_hat_start + d * np.sin(theta_hat_L)
-        y_hat_end_R = y_hat_start + d * np.sin(theta_hat_R)
+        y_hat_end_L = y_hat_start + head_width * np.sin(theta_hat_L)
+        y_hat_end_R = y_hat_start + head_width * np.sin(theta_hat_R)
 
         # draw
         for width, color, label in zip(widths, colors, labels):
@@ -142,6 +144,24 @@ class Dot:
     ):
         ax = ax or plt.gca()
         ax.scatter(x, y, zorder=zorder, s=s, color=color, **kwargs)
+
+
+class Dots:
+    def __init__(
+        self,
+        x: np.ndarray,
+        y: np.ndarray,
+        ax: plt.Axes = None,
+        zorder=100,
+        s=100,
+        color="k",
+        step: int = 1,
+        **kwargs,
+    ):
+        ax = ax or plt.gca()
+        ax.scatter(
+            x[::step], y[::step], zorder=zorder, s=s, color=color, **kwargs
+        )
 
 
 class Rectangle:

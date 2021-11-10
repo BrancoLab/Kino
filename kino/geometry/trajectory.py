@@ -43,7 +43,10 @@ class Trajectory:
             self.compute_kinematics(smoothing_window)
 
     def __len__(self):
-        return len(self.x) if isinstance(self.x, np.ndarray) else 1
+        try:
+            return len(self.x)
+        except TypeError:
+            return 1
 
     def __repr__(self):
         return f'Trajectory: "{self.name}"'
@@ -62,7 +65,7 @@ class Trajectory:
         elif isinstance(item, str):
             return self.__dict__[item]
 
-    def __matmul__(self, other: np.ndarray) -> Trajectory:
+    def __matmul__(self, other: Union[int, np.ndarray]) -> Trajectory:
         """
             Override @ operator to filter path at timestamps
             (e.g. at given timepoints)
@@ -154,10 +157,20 @@ class AnchoredTrajectory:
         Represents a sequence of 2D vectors at a sequence of points (XY).
     """
 
-    x: np.ndarray
-    y: np.ndarray
+    x: np.ndarray  # or floats
+    y: np.ndarray  # or floats
     vector: Vector
+    color: str
     name: str
 
     def __repr__(self) -> str:
         return f"AnchoredTrajectory: {self.name}"
+
+    def __matmul__(self, other: Union[int, np.ndarray]) -> AnchoredTrajectory:
+        return AnchoredTrajectory(
+            self.x[other],
+            self.y[other],
+            self.vector[other],
+            self.color,
+            self.name,
+        )

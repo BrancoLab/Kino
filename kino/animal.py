@@ -12,6 +12,7 @@ from myterial import (
     blue_grey_light,
     blue_grey_dark,
     blue_grey_darker,
+    salmon,
 )
 
 
@@ -40,10 +41,7 @@ class Bone:
     bp1: BodyPart
     bp2: BodyPart
     color: str
-
-    @property
-    def name(self) -> str:
-        return f"{self.bp1.name}_{self.bp2.name}"
+    name: str
 
     def __repr__(self) -> str:
         return f"Bone: '{self.bp1.name} -> {self.bp2.name}''"
@@ -116,9 +114,28 @@ bones ({self.n_bones}) = {self.bones}
                 or bp2 not in animal_data["bodyparts"]
             ):
                 raise ValueError(f'Bodypart "{bp1}" or "{bp2}" not found')
+
+            bp1, bp2 = (
+                getattr(self, bp1),
+                getattr(self, bp2),
+            )  # get BodyPart from name
             self.bones.append(
-                Bone(getattr(self, bp1), getattr(self, bp2), color,)
+                Bone(bp1, bp2, color, name=f"{bp1.name}_{bp2.name}")
             )
+
+        # add body and head 'bones'
+        self.body_axis = Bone(
+            self[animal_data["body_axis"][0]],
+            self[animal_data["body_axis"][1]],
+            color=blue_grey_darker,
+            name="body_axis",
+        )
+        self.head = Bone(
+            self[animal_data["head"][0]],
+            self[animal_data["head"][1]],
+            color=salmon,
+            name="head",
+        )
 
         # store metadata
         self.n_bones = len(self.bones)
@@ -132,6 +149,8 @@ bones ({self.n_bones}) = {self.bones}
 default_animal_data = dict(
     name="Mouse",
     paws=("left_fl", "right_fl", "right_hl", "left_hl"),
+    body_axis=("tail_base", "neck"),
+    head=("neck", "snout"),
     bodyparts=(
         "left_fl",
         "right_fl",

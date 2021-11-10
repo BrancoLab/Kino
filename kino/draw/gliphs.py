@@ -20,7 +20,7 @@ class Arrow:
         theta: float,  # in degrees
         L: float = 1,  # length
         width: float = 4,
-        head_width: float = 1,
+        head_width: float = None,
         color: str = blue_grey_dark,
         zorder: int = 100,
         ax: plt.Axes = None,

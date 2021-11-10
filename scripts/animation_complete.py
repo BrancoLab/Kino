@@ -18,6 +18,10 @@ tracking = pd.read_hdf("scripts/example_tracking.h5")
 
 
 locomotion = Locomotion(mouse, tracking, fps=60)
+
+for bp in locomotion.bodyparts.values():
+    bp.thetadot[0] = 0
+
 egocentric = locomotion.to_egocentric()
 
 anim = CompleteAnimation(

@@ -8,8 +8,11 @@ import matplotlib.pyplot as plt
 
 from kino.animal import mouse
 from kino.locomotion import Locomotion
-from kino.animate.base import PoseAnimation
+from kino.animate import PoseAnimation
 
+"""
+    Example on how to animate pose data in allocentric reference frame
+"""
 
 tracking = pd.read_hdf("scripts/example_tracking.h5")
 

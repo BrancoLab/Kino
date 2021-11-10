@@ -70,6 +70,7 @@ class CompleteAnimation:
             Creates and saves the animation
         """
         if self.fps is None:
+            # TODO remove this and add mypy skip bleow
             raise ValueError
         self._check_inputs()
 

@@ -16,7 +16,10 @@ tracking = pd.read_hdf("scripts/example_tracking.h5")
 
 locomotion = Locomotion(mouse, tracking, fps=60)
 
-f, ax = plt.subplots(figsize=(8, 10))
+f, ax = plt.subplots(figsize=(7, 9))
+
+
+# plot paws/com trajectory
 draw_locomotion.plot_locomotion_2D(locomotion, ax)
 
 plt.show()

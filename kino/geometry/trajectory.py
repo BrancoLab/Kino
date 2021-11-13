@@ -93,6 +93,22 @@ class Trajectory:
         return new_traj
 
     @property
+    def longitudinal_acceleration(self):
+        """
+            Returns the projection of the acceleration
+            vector onto the tangential direction
+        """
+        return smooth(self.acceleration.dot(self.tangent))
+
+    @property
+    def normal_acceleration(self):
+        """
+            Returns the projection of the acceleration
+            vector onto the normal direction
+        """
+        return smooth(self.acceleration.dot(self.normal))
+
+    @property
     def frames(self) -> np.ndarray:
         """
             Array with frame index
@@ -135,7 +151,7 @@ class Trajectory:
         ) = vu.compute_vectors_from_coordinates(self.x, self.y, fps=self.fps)
 
         # smooth kinematics
-        if window:
+        if window > 1:
             self.velocity = vu.smooth_vector(self.velocity, window)
             self.acceleration = vu.smooth_vector(self.acceleration, window)
             self.tangent = vu.smooth_vector(self.tangent, window)
@@ -178,3 +194,19 @@ class AnchoredTrajectory:
             self.color,
             self.name,
         )
+
+    @property
+    def theta(self):
+        return self.vector.angle2
+
+    @property
+    def thetadot(self):
+        val = smooth(angular_derivative(self.theta))
+        val[:2] = val[3]
+        return val
+
+    @property
+    def thetadotdot(self):
+        val = smooth(derivative(self.thetadot))
+        val[:2] = val[3]
+        return val

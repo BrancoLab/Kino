@@ -1,12 +1,13 @@
 import matplotlib.pyplot as plt
 from typing import List, Tuple, Optional
 
-from kino.locomotion import Locomotion
+from kino.locomotion import Locomotion, EgocentricLocomotion
 from kino.animate.base import (
     PoseAnimation,
     AnimationCore,
     VectorAnimation,
     ScalarAnimation,
+    TrajectoriesListAnimation,
 )
 from kino.draw import colors
 
@@ -20,7 +21,7 @@ class CompleteAnimation(AnimationCore):
     def __init__(
         self,
         locomotion: Locomotion,
-        egocentric_locomotion: Locomotion,
+        egocentric_locomotion: EgocentricLocomotion,
         fps: int = 1,
         bodyparts: Optional[List[str]] = None,
     ):
@@ -28,6 +29,16 @@ class CompleteAnimation(AnimationCore):
         self.locomotion = locomotion
         self.egocentric_locomotion = egocentric_locomotion
         self.bodyparts = bodyparts
+
+        # project COM trajectory allo -> ego
+        self.com_2_ego = self.egocentric_locomotion.project_to_egocentric(
+            locomotion.com
+        )
+
+        # project velocity and acceleration vecs
+        self.velocity_2_ego = self.egocentric_locomotion.project_vector(
+            locomotion.com.velocity
+        )
 
     def _check_inputs(self):
         """
@@ -100,6 +111,15 @@ class CompleteAnimation(AnimationCore):
             plot_kwargs=dict(color=colors.acceleration, width=4,),
         )
 
+        ego_velocity_anim = VectorAnimation(
+            self.velocity_2_ego,
+            vector_length=2,
+            data_fps=self.locomotion.fps,
+            animation_fps=self.fps,
+            ax=self.axes["E"],
+            plot_kwargs=dict(color=colors.velocity, width=4,),
+        )
+
         # create scalars animation elements
         speed_anim = ScalarAnimation(
             self.locomotion.com.speed,
@@ -119,14 +139,21 @@ class CompleteAnimation(AnimationCore):
             time_range=1,
         )
 
+        # com - allo -> ego animation
+        com2ego_anim = TrajectoriesListAnimation(
+            self.com_2_ego, self.axes["E"]
+        )
+
         # keep track of all animators
         self.animators = [
             allocentric_anim,
             egocentric_anim,
             allo_velocity_anim,
             allo_accel_anim,
+            ego_velocity_anim,
             speed_anim,
             avel_anim,
+            com2ego_anim,
         ]
 
     def make_next_frame(self) -> bool:
@@ -149,3 +176,5 @@ class CompleteAnimation(AnimationCore):
             lw=2,
             color=self.locomotion.com.color,
         )
+
+        self.axes["E"].set(xlim=[-10, 10], ylim=[-10, 10])

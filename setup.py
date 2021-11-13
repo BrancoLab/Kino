@@ -7,30 +7,18 @@ with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
 
 requirements = [
     "numpy",
-    "pandas",
     "matplotlib",
-    "sympy",
-    "h5py",
-    "click",
-    "numba",
     "rich",
     "sklearn",
-    "slackclient",
-    "dropbox",
+    "celluloid",
     "pyinspect",
     "loguru",
-    "pyrnn",
-    "vedo",
-    "fcutils",
-    "celluloid",
-    "odfpy",
-    "datajoint==0.12.6",
 ]
 
 setup(
-    name="locoproj",
+    name="kino",
     version="0.0.1",
-    description="Physical locomotion model",
+    description="Locomotion kinematics analysis",
     long_description=long_description,
     long_description_content_type="text/markdown",
     install_requires=requirements,
@@ -39,7 +27,7 @@ setup(
         exclude=("control", "models", "playground", "Screenshots")
     ),
     include_package_data=True,
-    url="https://github.com/FedeClaudi/pysical_locomotion",
+    url="",
     author="Federico Claudi",
     zip_safe=False,
     entry_points={"console_scripts": []},

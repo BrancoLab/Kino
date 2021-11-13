@@ -4,6 +4,22 @@ from scipy import stats
 import math
 
 
+def normalize(values: np.ndarray) -> np.ndarray:
+    """
+        Normalizes an array to the [0, 1] range
+    """
+    values -= values.min()
+    return values / values.max()
+
+
+def unwrap(angles: np.ndarray) -> np.ndarray:
+    """
+        Given an array of angles (in degrees),
+        in returns the unwrapped angles in degrees
+    """
+    return np.degrees(np.unwrap(np.radians(angles)))
+
+
 def pi_2_pi(theta: float) -> float:
     while theta > math.pi:
         theta -= 2.0 * math.pi

@@ -178,10 +178,10 @@ class ScalarAnimation(AnimationCore):
         if t == 0:
             return True
         elif t < self.wnd:
-            pad = 2 * self.wnd - t
+            pad = self.wnd - t
             # less than half-window has elapsed
             y = np.zeros_like(x)
-            y[pad:] = self.scalar[:t]
+            y[pad:] = self.scalar[: t + self.wnd]
         elif t > self.n_original_frames - self.wnd:
             # less than half-window from end
             pad = 2 * self.wnd - len(self.scalar[t - self.wnd :])
@@ -196,6 +196,34 @@ class ScalarAnimation(AnimationCore):
         self.ax.set(xticks=[-self.wnd, 0, self.wnd])
 
         return True
+
+
+class TrajectoriesListAnimation:
+    """
+        Given a List[Trajectory] object it plots
+        one of each at each frame.
+    """
+
+    def __init__(self, trajectories: List[Trajectory], ax: plt.Axes):
+        self.frame_idx = 0
+        self.interpolation_idx = (
+            0  # not used but for consistency with other animators
+        )
+        self.trajectories = trajectories
+        self.ax = ax
+
+    def update_frames_index(self):
+        # not used
+        return None
+
+    def make_next_frame(self):
+        if self.frame_idx < len(self.trajectories):
+            self.ax.plot(
+                self.trajectories[self.frame_idx].x,
+                self.trajectories[self.frame_idx].y,
+                color=self.trajectories[self.frame_idx].color,
+            )
+        self.frame_idx += 1
 
 
 class VectorAnimation(AnimationCore):

@@ -88,6 +88,9 @@ class Vector:  # 2D vector
 
     @property
     def magnitude(self) -> np.ndarray:
+        """
+            Vector magnitude
+        """
         if self.single_vec:
             return np.sqrt(self.x ** 2 + self.y ** 2)
         else:
@@ -95,18 +98,38 @@ class Vector:  # 2D vector
             vec = np.vstack([self.x, self.y]).T
             return np.apply_along_axis(np.linalg.norm, 1, vec)
 
-    def rotate(self, angle: float) -> Vector:
+    def rotate(self, angle: float = None, R: np.ndarray = None) -> Vector:
         """
             It rotates the vector by a given angle
         """
-        R = coordinates.R(angle)
+        if angle is not None:
+            R = coordinates.R(angle)
+        elif R is None:
+            raise ValueError("Either R or angle should be not None")
 
         if self.single_vec:
             xy_rot = R @ self.xy.ravel()
-
         else:
             xy_rot = R @ self.xy
         return Vector(xy_rot[0], xy_rot[1])
+
+    def rotate_each(
+        self, angles: List[float] = None, Rs: np.ndarray = None
+    ) -> Vector:
+        """
+            It rotates the vector by a given angle, but a different
+            angle for each frame
+        """
+        # compute rotation matrices
+        if angles is not None:
+            Rs = [coordinates.R(angle) for angle in angles]
+        elif Rs is None:
+            raise ValueError("Either Rs or angles should be not None")
+
+        # rotate each
+        rotated = [self[frame].rotate(R=R) for frame, R in enumerate(Rs)]
+
+        return Vector([rot.x for rot in rotated], [rot.y for rot in rotated])
 
     def to_polar(self) -> Tuple[np.ndarray, np.ndarray]:
         rho = np.hypot(self.x, self.y)

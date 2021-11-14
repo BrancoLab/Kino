@@ -22,7 +22,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     install_requires=requirements,
-    python_requires=">=3.6, <3.8",
+    python_requires=">=3.6",
     packages=find_namespace_packages(
         exclude=("control", "models", "playground", "Screenshots")
     ),

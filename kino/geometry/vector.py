@@ -10,6 +10,7 @@ from typing import Union, Tuple, List
 from myterial import pink, blue
 
 from kino.geometry import coordinates
+from kino.draw.gliphs import Arrow
 
 
 class Vector:  # 2D vector
@@ -36,7 +37,7 @@ class Vector:  # 2D vector
 
     def __repr__(self):
         if self.single_vec:
-            return f"Vector @ ({self.x}, {self.y})"
+            return f"Vector @ ({self.x:.3f}, {self.y:.3f})"
         else:
             return f"Array of {len(self.x)} vectors."
 
@@ -97,6 +98,11 @@ class Vector:  # 2D vector
             # compute norm of each vector
             vec = np.vstack([self.x, self.y]).T
             return np.apply_along_axis(np.linalg.norm, 1, vec)
+
+    def draw(self, **kwargs):
+        if not self.single_vec:
+            raise NotImplementedError
+        Arrow(0, 0, self.angle, L=self.magnitude, **kwargs)
 
     def rotate(self, angle: float = None, R: np.ndarray = None) -> Vector:
         """

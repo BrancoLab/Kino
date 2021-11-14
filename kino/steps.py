@@ -1,5 +1,6 @@
 import numpy as np
-from loguru import logger
+
+# from loguru import logger
 
 from kino.math import convolve_with_gaussian
 from kino.geometry import Trajectory
@@ -56,6 +57,6 @@ class Paw:
             self.swings_start.append(start)
             self.swings_end.append(end)
             self.swings_duration.append(dur)
-        logger.debug(
-            f'Paw "{self.name}" detect {len(starts)} potential steps, kept {len(self.swings_start)}'
-        )
+        # logger.debug(
+        #     f'Paw "{self.name}" detect {len(starts)} potential steps, kept {len(self.swings_start)}'
+        # )

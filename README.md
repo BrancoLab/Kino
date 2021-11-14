@@ -9,4 +9,5 @@
 - [x] add scalars animation
 
 - [ ] make sure core functionality works without paws
-- [ ] extract basic quantities from the CoM trajectory (speed, curvature, angular velocity...)
+- [x] extract basic quantities from the CoM trajectory (speed, curvature, angular velocity...)
+- [ ] document what we have so far 

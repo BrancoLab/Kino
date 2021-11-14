@@ -6,7 +6,8 @@ from typing import Union, List
 import rich.repr
 import numpy as np
 from copy import copy
-from loguru import logger
+
+# from loguru import logger
 
 from myterial import blue_grey_dark
 
@@ -76,10 +77,10 @@ class Locomotion:
             for paw_name in animal.paws
         }
 
-        dur = self.bodyparts["body"].duration
-        logger.debug(
-            f'Created {self.view} locomotion for animal "{self.animal.name}": {dur:.2f}s ({self.fps} fps)'
-        )
+        # dur = self.bodyparts["body"].duration
+        # logger.debug(
+        #     f'Created {self.view} locomotion for animal "{self.animal.name}": {dur:.2f}s ({self.fps} fps)'
+        # )
 
     def __getitem__(self, item: Union[int, str]):
         """
@@ -214,9 +215,9 @@ class Locomotion:
             egocentric.animal.body_axis
         )
 
-        logger.debug(
-            f'Created {egocentric.view} locomotion for animal "{egocentric.animal.name}"'
-        )
+        # logger.debug(
+        #     f'Created {egocentric.view} locomotion for animal "{egocentric.animal.name}"'
+        # )
         return egocentric
 
 

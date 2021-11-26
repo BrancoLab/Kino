@@ -5,7 +5,6 @@ import pandas as pd
 from typing import Union, List
 import rich.repr
 import numpy as np
-from copy import copy
 
 # from loguru import logger
 
@@ -28,7 +27,7 @@ class Locomotion:
     def __init__(
         self,
         animal: Animal,
-        tracking: Union[dict, pd.DataFrame],
+        tracking: Union[dict, pd.DataFrame, pd.Series],
         fps: int = 1,
     ):
         self.animal = animal
@@ -77,11 +76,6 @@ class Locomotion:
             for paw_name in animal.paws
         }
 
-        # dur = self.bodyparts["body"].duration
-        # logger.debug(
-        #     f'Created {self.view} locomotion for animal "{self.animal.name}": {dur:.2f}s ({self.fps} fps)'
-        # )
-
     def __getitem__(self, item: Union[int, str]):
         """
             returns a bodypart or bone if a string is passed, otherwise the 
@@ -115,10 +109,13 @@ class Locomotion:
             Ovveriding @ operator to index the locomotor state at a frame
             (or set of frames)
         """
-        new_locomotion = copy(self)
+        new_locomotion = deepcopy(self)
         new_locomotion.bodyparts = {
             name: bp @ other for name, bp in new_locomotion.bodyparts.items()
         }
+        for bpname, bp in new_locomotion.bodyparts.items():
+            setattr(new_locomotion, bpname, bp)
+
         new_locomotion.bones = {
             name: bone @ other for name, bone in new_locomotion.bones.items()
         }

@@ -66,6 +66,18 @@ class DrawBone:
             **kwargs,
         )
 
+    @staticmethod
+    def plot(bone: AnchoredTrajectory, ax: plt.Axes, **kwargs):
+        """
+            Plots a bone as a 2D line 
+        """
+        ax.plot(
+            [bone.x, bone.x + bone.vector.x],
+            [bone.y, bone.y + bone.vector.y],
+            color=bone.color,
+            **kwargs,
+        )
+
 
 class DrawAnimal:
     """
@@ -88,6 +100,11 @@ class DrawAnimal:
 
         # mark CoM
         DrawBodyPart.scatter(locomotion["com"], ax, s=75)
+
+        # mark bones
+        for bone in locomotion.bones:
+            if bone not in ("body_axis", "head"):
+                DrawBone.plot(locomotion[bone], ax, alpha=0.4, ls="--", lw=1)
 
         # draw body axis and head
         DrawBone(locomotion.body_axis, ax)

@@ -42,14 +42,14 @@ class Trajectory:
         if compute_kinematics:
             self.compute_kinematics(smoothing_window)
 
-    def __len__(self):
+    def __len__(self) -> int:
         try:
             return len(self.x)
         except TypeError:
             return 1
 
     def __repr__(self):
-        return f'Trajectory: "{self.name}"'
+        return f'Trajectory: "{self.name}" | {len(self)} data points'
 
     def __getitem__(self, item: Union[str, int]) -> Union[Vector, np.ndarray]:
         """
@@ -85,7 +85,7 @@ class Trajectory:
         new_traj.acceleration = self.acceleration[other]
         new_traj.speed = self.speed[other]
         new_traj.curvature = self.curvature[other]
-        new_traj.acceleration_mag = self.acceleration_mag[other]
+        new_traj.acceleration_mag = self.acceleration_mag[other]  # type: ignore
         new_traj.theta = self.theta[other]
         new_traj.thetadot = self.thetadot[other]
         new_traj.thetadotdot = self.thetadotdot[other]
@@ -159,11 +159,12 @@ class Trajectory:
             self.curvature = smooth(self.curvature, window)
 
         self.speed = self.velocity.magnitude
-        self.acceleration_mag = self.acceleration.magnitude
+        self.acceleration_mag = self.acceleration.dot(self.tangent)
 
         # compute tangential angle and angular velocity
         self.theta = 180 - self.tangent.angle
         self.thetadot = angular_derivative(self.theta) * self.fps
+        self.thetadot[:3] = self.thetadot[4]
         self.thetadotdot = derivative(self.thetadot)
 
         # compute distance travelled
@@ -183,8 +184,11 @@ class AnchoredTrajectory:
     color: str
     name: str
 
+    def __len__(self) -> int:
+        return len(self.x)
+
     def __repr__(self) -> str:
-        return f"AnchoredTrajectory: {self.name}"
+        return f"AnchoredTrajectory: {self.name} | {len(self)} points"
 
     def __matmul__(self, other: Union[int, np.ndarray]) -> AnchoredTrajectory:
         return AnchoredTrajectory(

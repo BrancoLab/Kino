@@ -8,7 +8,7 @@ import numpy as np
 
 from kino.animal import mouse
 from kino.locomotion import Locomotion
-from kino.draw import DrawAnimal
+from kino.draw.animal import DrawAnimal
 
 
 tracking = pd.read_hdf("scripts/example_tracking.h5")

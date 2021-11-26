@@ -10,7 +10,7 @@ from typing import Union, Tuple, List
 from myterial import pink, blue
 
 from kino.geometry import coordinates
-from kino.draw.gliphs import Arrow
+from kino.draw.gliphs import Arrow, Arrows
 
 
 class Vector:  # 2D vector
@@ -101,8 +101,9 @@ class Vector:  # 2D vector
 
     def draw(self, **kwargs):
         if not self.single_vec:
-            raise NotImplementedError
-        Arrow(0, 0, self.angle, L=self.magnitude, **kwargs)
+            Arrows(0, 0, self.angle, L=self.magnitude, **kwargs)
+        else:
+            Arrow(0, 0, self.angle, L=self.magnitude, **kwargs)
 
     def rotate(self, angle: float = None, R: np.ndarray = None) -> Vector:
         """

@@ -11,8 +11,14 @@ from dataclasses import dataclass
 from myterial import blue_grey_dark
 
 from kino.geometry import Vector
+from kino.geometry.interpolation import lerp
 from kino.geometry import vectors_utils as vu
-from kino.math import smooth, derivative, angular_derivative
+from kino.math import (
+    smooth,
+    derivative,
+    angular_derivative,
+    resample_linear_1d,
+)
 
 
 class Trajectory:
@@ -49,7 +55,7 @@ class Trajectory:
             return 1
 
     def __repr__(self):
-        return f'Trajectory: "{self.name}" | {len(self)} data points'
+        return f'Trajectory: "{self.name}" | {self.distance:.2f}cm, {len(self)} data points'
 
     def __getitem__(self, item: Union[str, int]) -> Union[Vector, np.ndarray]:
         """
@@ -170,6 +176,103 @@ class Trajectory:
         # compute distance travelled
         self.distance = np.sum(self.speed) / self.fps
         self.comulative_distance = np.cumsum(self.speed) / self.fps
+
+    def interpolate(self, spacing: float = 1) -> Trajectory:
+        """
+            Interpolates the current path to produce 
+            a new path with points 'spacing' apart
+        """
+        generated: dict = dict(x=[], y=[])
+        for n in range(len(self) - 1):
+            # get current and next point
+            p0 = self[n]
+            p1 = self[n + 1]
+
+            # get number of new points
+            segment = p1 - p0
+            if segment.magnitude <= spacing:
+                if n > 0:
+                    prev = Vector(generated["x"][-1], generated["y"][-1])
+                    if (prev - p0).magnitude >= spacing:
+                        generated["x"].append(p0.x)
+                        generated["y"].append(p0.y)
+                    else:
+                        continue
+                else:
+                    generated["x"].append(p0.x)
+                    generated["y"].append(p0.y)
+            else:
+                n_new = int(np.floor(segment.magnitude / spacing))
+
+                # create new points
+                for p in np.linspace(0, 1, n_new):
+                    if n > 0 and p == 0:
+                        continue  # avoid doubling
+                    generated["x"].append(lerp(p0.x, p1.x, p))
+                    generated["y"].append(lerp(p0.y, p1.y, p))
+        return Trajectory(generated["x"], generated["y"])
+
+    def downsample(self, spacing: float = 1) -> Trajectory:
+        """
+            Downsamples the path keeping only points that are spacing apart.
+            It downsamples the path by selecting points that are spaced
+            along the path: the spacing reflects the path-length between two
+            points along the original path, even though they might be very close in 
+            euclidean terms.
+        """
+        downsampled: dict = dict(x=[], y=[])
+        for n in range(len(self)):
+            if n == 0:
+                downsampled["x"].append(self[0].x)
+                downsampled["y"].append(self[0].y)
+                last_distance = 0
+            else:
+                # get path distance until current point
+                curr_distance = np.sum(self.speed[:n]) / self.fps
+
+                if curr_distance - last_distance > spacing:
+                    downsampled["x"].append(self[n].x)
+                    downsampled["y"].append(self[n].y)
+                    last_distance = curr_distance
+        return Trajectory(downsampled["x"], downsampled["y"])
+
+    def downsample_euclidean(self, spacing: float = 1) -> Trajectory:
+        """
+            Downsamples the path keeping only points that are spacing apart.
+            This function looks at the euclidean distance between points, 
+            ignores the path length distance between them
+        """
+        downsampled: dict = dict(x=[], y=[])
+        for n in range(len(self)):
+            if n == 0:
+                downsampled["x"].append(self[0].x)
+                downsampled["y"].append(self[0].y)
+            else:
+                p0 = Vector(downsampled["x"][-1], downsampled["y"][-1])
+                p1 = self[n]
+
+                # if distance > spacing
+                if (p1 - p0).magnitude >= spacing:
+                    # the distance between the two could be > spacing
+                    # get a new point at the right distance
+                    vec = p1 - p0
+                    downsampled["x"].append(
+                        p0.x + spacing * np.cos(np.radians(vec.angle))
+                    )
+                    downsampled["y"].append(
+                        p0.y + spacing * np.sin(np.radians(vec.angle))
+                    )
+        return Trajectory(downsampled["x"], downsampled["y"])
+
+    def downsample_in_time(self, n_timesteps: int) -> Trajectory:
+        """
+            It downsamples the X,Y trajectories to have a target number of
+            samples
+        """
+        return Trajectory(
+            resample_linear_1d(self.x, n_timesteps),
+            resample_linear_1d(self.y, n_timesteps),
+        )
 
 
 @dataclass

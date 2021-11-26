@@ -2,7 +2,8 @@ from typing import Union
 from copy import copy
 
 from kino.locomotion import Locomotion
-from kino.geometry import Vector, Trajectory, AnchoredTrajectory
+
+from kino.geometr import Vector, Trajectory, AnchoredTrajectory
 
 
 def lerp(x0: float, x1: float, p: float) -> float:

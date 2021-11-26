@@ -10,8 +10,8 @@ from dataclasses import dataclass
 
 from myterial import blue_grey_dark
 
+import kino.geometry.interpolation as interpolation
 from kino.geometry import Vector
-from kino.geometry.interpolation import lerp
 from kino.geometry import vectors_utils as vu
 from kino.math import (
     smooth,
@@ -208,8 +208,8 @@ class Trajectory:
                 for p in np.linspace(0, 1, n_new):
                     if n > 0 and p == 0:
                         continue  # avoid doubling
-                    generated["x"].append(lerp(p0.x, p1.x, p))
-                    generated["y"].append(lerp(p0.y, p1.y, p))
+                    generated["x"].append(interpolation.lerp(p0.x, p1.x, p))
+                    generated["y"].append(interpolation.lerp(p0.y, p1.y, p))
         return Trajectory(generated["x"], generated["y"])
 
     def downsample(self, spacing: float = 1) -> Trajectory:

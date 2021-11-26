@@ -7,7 +7,8 @@ import numpy as np
 
 from kino.progress import track
 from kino.locomotion import Locomotion
-from kino.draw import DrawAnimal, gliphs
+from kino.draw import gliphs
+from kino.draw.animal import DrawAnimal
 from kino.geometry import Vector, Trajectory
 
 

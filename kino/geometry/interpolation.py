@@ -3,7 +3,9 @@ from copy import copy
 
 from kino.locomotion import Locomotion
 
-from kino.geometr import Vector, Trajectory, AnchoredTrajectory
+import kino.geometry as kg
+
+# import kg.Vector, kg.Trajectory, kg.AnchoredTrajectory
 
 
 def lerp(x0: float, x1: float, p: float) -> float:
@@ -14,16 +16,16 @@ def lerp(x0: float, x1: float, p: float) -> float:
     return (1 - p) * x0 + p * x1
 
 
-def interpolate_vectors(v0: Vector, v1: Vector, p: float) -> Vector:
+def interpolate_vectors(v0: kg.Vector, v1: kg.Vector, p: float) -> kg.Vector:
     """
         Interpolates two 2D vectors
     """
-    return Vector(lerp(v0.x, v1.x, p), lerp(v0.y, v1.y, p))
+    return kg.Vector(lerp(v0.x, v1.x, p), lerp(v0.y, v1.y, p))
 
 
 def interpolate_vector_at_frame(
-    vector: Vector, frame: int, p: float
-) -> Vector:
+    vector: kg.Vector, frame: int, p: float
+) -> kg.Vector:
     """
         Interpolates a 2D vector between two following frames
     """
@@ -34,8 +36,8 @@ def interpolate_vector_at_frame(
 
 
 def interpolate_trajectory_at_frame(
-    trajectory: Trajectory, frame: int, p: float
-) -> Trajectory:
+    trajectory: kg.Trajectory, frame: int, p: float
+) -> kg.Trajectory:
     """
         Interpolate a trajectory at a frame
     """
@@ -44,7 +46,7 @@ def interpolate_trajectory_at_frame(
     t1 = trajectory @ (frame + 1)
 
     # create new trajectory object
-    newT = Trajectory(
+    newT = kg.Trajectory(
         lerp(t0.x, t1.x, p),
         lerp(t0.y, t1.y, p),
         fps=trajectory.fps,
@@ -71,17 +73,17 @@ def interpolate_trajectory_at_frame(
 
 
 def interpolate_anchored_trajectory_at_frame(
-    trajectory: AnchoredTrajectory, frame: int, p: float
-) -> AnchoredTrajectory:
+    trajectory: kg.AnchoredTrajectory, frame: int, p: float
+) -> kg.AnchoredTrajectory:
     """
-        Interpolates an AnchoredTrajectory object at a frame
+        Interpolates an kg.AnchoredTrajectory object at a frame
     """
     # get snapshots
     t0 = trajectory @ frame
     t1 = trajectory @ (frame + 1)
 
     # create new interpolated
-    return AnchoredTrajectory(
+    return kg.AnchoredTrajectory(
         x=lerp(t0.x, t1.x, p),
         y=lerp(t0.y, t1.y, p),
         vector=interpolate_vectors(t0.vector, t1.vector, p),
@@ -115,18 +117,18 @@ def interpolate_locomotion_at_frame(
 
 
 def interpolate_at_frame(
-    obj: Union[Vector, Trajectory, AnchoredTrajectory, Locomotion],
+    obj: Union[kg.Vector, kg.Trajectory, kg.AnchoredTrajectory, Locomotion],
     frame: int,
     p: float,
 ):
     """
         Generic interpolation function for different geometric objects
     """
-    if isinstance(obj, Vector):
+    if isinstance(obj, kg.Vector):
         return interpolate_vector_at_frame(obj, frame, p)
-    elif isinstance(obj, Trajectory):
+    elif isinstance(obj, kg.Trajectory):
         return interpolate_trajectory_at_frame(obj, frame, p)
-    elif isinstance(obj, AnchoredTrajectory):
+    elif isinstance(obj, kg.AnchoredTrajectory):
         return interpolate_anchored_trajectory_at_frame(obj, frame, p)
     elif isinstance(obj, Locomotion):
         return interpolate_locomotion_at_frame(obj, frame, p)

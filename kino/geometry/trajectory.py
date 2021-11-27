@@ -41,6 +41,7 @@ class Trajectory:
         self.x = np.array(x)
         self.y = np.array(y)
         self.xy = Vector(self.x, self.y)
+        self.points = np.array([self.x, self.y]).T
         self.fps = fps
         self.name = name
         self.color = color
@@ -95,24 +96,11 @@ class Trajectory:
         new_traj.theta = self.theta[other]
         new_traj.thetadot = self.thetadot[other]
         new_traj.thetadotdot = self.thetadotdot[other]
-
+        new_traj.longitudinal_acceleration = self.longitudinal_acceleration[
+            other
+        ]
+        new_traj.normal_acceleration = self.normal_acceleration[other]
         return new_traj
-
-    @property
-    def longitudinal_acceleration(self):
-        """
-            Returns the projection of the acceleration
-            vector onto the tangential direction
-        """
-        return smooth(self.acceleration.dot(self.tangent))
-
-    @property
-    def normal_acceleration(self):
-        """
-            Returns the projection of the acceleration
-            vector onto the normal direction
-        """
-        return smooth(self.acceleration.dot(self.normal))
 
     @property
     def frames(self) -> np.ndarray:
@@ -176,6 +164,14 @@ class Trajectory:
         # compute distance travelled
         self.distance = np.sum(self.speed) / self.fps
         self.comulative_distance = np.cumsum(self.speed) / self.fps
+
+        # compute longitudinal and normal accelrations projections
+        self.longitudinal_acceleration = smooth(
+            self.acceleration.dot(self.tangent), window
+        )
+        self.normal_acceleration = smooth(
+            self.acceleration.dot(self.normal), window
+        )
 
     def interpolate(self, spacing: float = 1) -> Trajectory:
         """

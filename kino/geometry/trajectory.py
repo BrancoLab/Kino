@@ -96,10 +96,10 @@ class Trajectory:
         new_traj.theta = self.theta[other]
         new_traj.thetadot = self.thetadot[other]
         new_traj.thetadotdot = self.thetadotdot[other]
-        new_traj.longitudinal_acceleration = self.longitudinal_acceleration[
+        new_traj.longitudinal_acceleration = self.longitudinal_acceleration[  # type: ignore
             other
         ]
-        new_traj.normal_acceleration = self.normal_acceleration[other]
+        new_traj.normal_acceleration = self.normal_acceleration[other]  # type: ignore
         return new_traj
 
     @property
@@ -140,7 +140,6 @@ class Trajectory:
             self.tangent,
             self.normal,
             self.acceleration,
-            self.speed,
             self.curvature,
         ) = vu.compute_vectors_from_coordinates(self.x, self.y, fps=self.fps)
 
@@ -153,7 +152,7 @@ class Trajectory:
             self.curvature = smooth(self.curvature, window)
 
         self.speed = self.velocity.magnitude
-        self.acceleration_mag = self.acceleration.dot(self.tangent)
+        self.acceleration_mag = self.acceleration.magnitude
 
         # compute tangential angle and angular velocity
         self.theta = 180 - self.tangent.angle
@@ -166,11 +165,11 @@ class Trajectory:
         self.comulative_distance = np.cumsum(self.speed) / self.fps
 
         # compute longitudinal and normal accelrations projections
-        self.longitudinal_acceleration = smooth(
-            self.acceleration.dot(self.tangent), window
+        self.longitudinal_acceleration = self.acceleration.dot(
+            self.tangent.to_unit_vector()
         )
-        self.normal_acceleration = smooth(
-            self.acceleration.dot(self.normal), window
+        self.normal_acceleration = self.acceleration.dot(
+            self.normal.to_unit_vector()
         )
 
     def interpolate(self, spacing: float = 1) -> Trajectory:

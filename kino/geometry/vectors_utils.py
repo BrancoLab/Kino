@@ -7,7 +7,7 @@ np.seterr(all="ignore")
 
 def compute_vectors_from_coordinates(
     x: np.ndarray, y: np.ndarray, fps: int = 1
-) -> Tuple[Vector, Vector, Vector, Vector, np.array, np.array]:
+) -> Tuple[Vector, Vector, Vector, Vector, np.array]:
     """
         Given the X and Y position at each frame -
 
@@ -80,7 +80,6 @@ def compute_vectors_from_coordinates(
             -unit_tangent[:, 1], unit_tangent[:, 0]
         ),  # normal as rotated tangent
         Vector(acceleration),
-        ds_dt * fps,
         curvature,
     )
 

@@ -59,6 +59,9 @@ class Vector:  # 2D vector
     def __sub__(self, other: Vector):
         return Vector(self.x - other.x, self.y - other.y)
 
+    def __add__(self, other: Vector):
+        return Vector(self.x + other.x, self.y + other.y)
+
     @classmethod
     def from_list(cls, vecs: List[Vector]) -> Vector:
         return Vector([v.x for v in vecs], [v.y for v in vecs])

@@ -54,3 +54,7 @@ Code to facilitate plotting of `kino` elements such as geometric object, `Animal
 Code to create smooth animations from kinematics data.
 
 - docs not ready -
+
+
+# Development
+`Kino` is still very much under active development and it will be so for the next few months. For more information, or if you'd like to contribute, get in touch.

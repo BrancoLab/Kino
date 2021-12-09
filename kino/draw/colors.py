@@ -3,12 +3,14 @@ import numpy as np
 from typing import Union, List, Optional
 import typing
 
-from myterial import blue, pink, salmon, teal, teal_darker
+from myterial import blue, pink, teal, teal_darker, blue_dark, red
+
+tangent = blue_dark
+normal = red
 
 
 velocity = blue
 acceleration = pink
-normal = salmon
 thetadot = teal
 thetadotdot = teal_darker
 

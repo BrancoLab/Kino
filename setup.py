@@ -9,10 +9,12 @@ requirements = [
     "numpy",
     "matplotlib",
     "rich",
+    "myterial",
     "sklearn",
     "celluloid",
     "pyinspect",
     "loguru",
+    "celluloid",
 ]
 
 setup(
@@ -23,9 +25,7 @@ setup(
     long_description_content_type="text/markdown",
     install_requires=requirements,
     python_requires=">=3.6",
-    packages=find_namespace_packages(
-        exclude=("control", "models", "playground", "Screenshots")
-    ),
+    packages=find_namespace_packages(exclude=("kino")),
     include_package_data=True,
     url="",
     author="Federico Claudi",
